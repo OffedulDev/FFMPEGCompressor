@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+  crossorigin="anonymous"></script>
+    <title>FFMPEG Compressor</title>
+  </head>
+  <body class="overflow-hidden bg-gradient-to-r from-violet-300 to-fuchsia-300">
+    <div class="flex flex-col justify-center items-center w-screen h-screen gap-3">
+      <div class="p-3 bg-gray-800 w-1/4 flex flex-col gap-3 shadow-lg rounded-md items-center">
+        <input type="file" id="input-files" class="w-full text-white font-bold rounded-full bg-gray-800">
+        <button id="convert-button" class="bg-green-500 p-3 w-full text-white rounded-full">Convert</button>
+      </div>
+      <span id="bar-container" class="overflow-hidden w-1/4 h-[1.5rem] outline outline-1 outline-black rounded-full bg-white">
+        <div id="progress-bar" class="w-0 h-full bg-green-500 rounded-full transition-all">
+
+        </div>
+      </span>
+    </div>
+    <script type="text/javascript">
+      $(document).ready(() => {
+        $("#bar-container").hide()
+        $("#convert-button").on("click", () => {
+          var array = []
+          var files = document.getElementById("input-files").files
+          for (let i = 0; i<files.length; i++) {
+            array.push(files[i].path)
+          }
+          window.electronAPI.convertFile(array)
+        })
+
+        window.electronAPI.onStartedConversion(() => {
+          $("#bar-container").show()
+          $("#progress-bar").animate({
+            width: "50%"
+          }, 20000)
+        })
+
+        window.electronAPI.onFinishedConversion(() => {
+          $("#progress-bar").stop(true, true)
+          $("#progress-bar").animate({
+            width: "100%"
+          }, 1, function(){
+            $("#bar-container").hide()
+            $("#progress-bar").css("width", "0%")
+          })
+        })
+      })
+    </script>
+  </body>
+</html>
